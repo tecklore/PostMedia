@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+
+
+    <style>
+        ul#countries li {
+            cursor: pointer;
+        }
+        ul#countries li:hover, ul#countries li:focus {
+            background-color: rgba(0,0,0,.03);
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>The 10 countries with the most case of COVID-19</h1>
+    <div class="card" >
+        <div class="card-header">
+            <div class="row">
+                <div class="col-md-6">
+                    <h2>Country<span> <small>(Click to see details)</small></span></h2>
+                </div>
+                <div class="col-md-6">
+                    <h2>Details</h2>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 border-right">
+                <ul id="countries" class="list-group list-group-flush">
+
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <ul id="details" class="list-group list-group-flush">
+
+                </ul>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- We don't need any of this as the code is simple but I wanted you to know I am aware of how to add these coding capabilities if you want to use a CDN -->
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+<script>
+    var array = [];
+    function getCovidData() {
+
+        fetch('https://api.covid19api.com/summary')
+            .then(
+                function(response) {
+                    if (response.status !== 200) {
+                        console.log('Looks like there was a problem. Status Code: ' +
+                            response.status);
+                        return;
+                    }
+
+                    // Transform Json to javascript object, turn it into an array so we can sort it, reverse the order to get the top ten
+                    response.json().then(function(data) {
+                        console.log(data);
+
+                        for (var i = 0; i < data.Countries.length; i++) {
+                            array.push(data.Countries[i]);
+                        }
+
+                        sortByKey(array, 'TotalConfirmed');
+                        array = array.reverse();
+                        console.log(array);
+
+                        for (var i = 0; i < 10; i++) {
+                            // Create the new element
+                            var li = document.createElement('li');
+                            li.className = 'list-group-item li-' + i; // Class name
+                            li.id = 'li-' + i; // ID
+                            li.setAttribute('data-num', i);
+                            li.innerHTML = array[i].Country; // Text inside
+                            document.getElementById("countries").appendChild(li); // Append it
+                        }
+
+                    });
+                }
+            )
+            .catch(function(err) {
+                console.log('Fetch Error :-S', err);
+            });
+        setEventHandlers();
+    }
+    function sortByKey(array, key) {
+        return array.sort(function(a, b) {
+            var x = a[key]; var y = b[key];
+            return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+        });
+    }
+    function setEventHandlers() {
+        document.getElementById("countries").addEventListener("click",function(e) {
+            if(e.target && e.target.nodeName == "LI") {
+                var detailsNum = e.target.getAttribute('data-Num')
+                createDetails(detailsNum);
+            }
+        });
+    }
+    function createDetails(i) {
+        console.log(i);
+        document.getElementById("details").innerHTML = "";
+        var li = document.createElement('LI');
+        li.className = 'list-group-item'; // Class name
+        li.innerHTML += "Total Confirmed: " + array[i].TotalConfirmed + "<br>";
+        li.innerHTML += "Country Code: " + array[i].CountryCode + "<br>";
+        li.innerHTML += "Date: " + array[i].Date + "<br>";
+        li.innerHTML += "Newly Confirmed: " + array[i].NewConfirmed + "<br>";
+        li.innerHTML += "New Deaths: " + array[i].NewDeaths + "<br>";
+        li.innerHTML += "Newly Recovered: " + array[i].NewRecovered + "<br>";
+        li.innerHTML += "Total Deaths: " + array[i].TotalDeaths + "<br>";
+        li.innerHTML += "Total Recovered: " + array[i].TotalRecovered + "<br>";
+        document.getElementById("details").appendChild(li);
+    }
+
+    getCovidData();
+</script>
+
+</body>
+</html>
