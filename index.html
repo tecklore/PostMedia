@@ -86,8 +86,7 @@
                         for (var i = 0; i < 10; i++) {
                             // Create the new element
                             var li = document.createElement('li');
-                            li.className = 'list-group-item li-' + i; // Class name
-                            li.id = 'li-' + i; // ID
+                            li.className = 'list-group-item'; // Class name
                             li.setAttribute('data-num', i);
                             li.innerHTML = array[i].Country; // Text inside
                             document.getElementById("countries").appendChild(li); // Append it
